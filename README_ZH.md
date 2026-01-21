@@ -1,6 +1,6 @@
 # Baiduwp-PHP
 
-[ENGLISH](README.md) | [中文](README_ZH.md)
+[中文](README_ZH.md)
 
 PanDownload 网页复刻版，PHP 语言版<br/>
 
