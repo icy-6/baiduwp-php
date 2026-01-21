@@ -7,6 +7,7 @@ use app\BaseController;
 use app\Request;
 use think\facade\Cache;
 use think\facade\Db;
+use think\facade\View;
 
 class Index extends BaseController
 {
@@ -16,10 +17,11 @@ class Index extends BaseController
 
     public function index()
     {
-        return view('admin/index', [
+        View::assign([
             'site_name' => config('baiduwp.site_name'),
             'program_version' => config('baiduwp.program_version'),
         ]);
+        return View::fetch(app()->getRootPath() . 'view/admin/index.html');
     }
 
     public function login(Request $request)
@@ -36,10 +38,11 @@ class Index extends BaseController
         if (session('admin')) {
             return redirect('/admin');
         }
-        return view('admin/login', [
+        View::assign([
             'site_name' => config('baiduwp.site_name'),
             'program_version' => config('baiduwp.program_version'),
         ]);
+        return View::fetch(app()->getRootPath() . 'view/admin/login.html');
     }
 
     public function info()

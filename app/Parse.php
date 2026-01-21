@@ -4,6 +4,7 @@ namespace app;
 
 use app\Req;
 use app\Tool;
+use app\VerificationService;
 use think\facade\Db;
 
 /**
@@ -133,7 +134,7 @@ class Parse
 					"size" => $file["size"],
 					"uploadtime" => $file["server_ctime"],
 					"md5" => $file["md5"],
-					"dlink" => $file["dlink"]
+					//"dlink" => $file["dlink"]
 				);
 			} else {
 				//文件夹
@@ -224,7 +225,7 @@ class Parse
 		);
 
 		if ($size <= 5242880) { // 5MB
-			return array("error" => 0, "filedata" => $FileData, "directlink" => $dlink, "user_agent" => "LogStatistic", "message" => $message);
+			return array("error" => 0, "filedata" => $FileData, "directlink" => $dlink, "user_agent" => "pan.baidu.com", "message" => $message);
 		}
 
 		list($ID, $cookie) = ["-1", config('baiduwp.svip_cookie') ? config('baiduwp.svip_cookie') : config('baiduwp.cookie')];
@@ -242,7 +243,7 @@ class Parse
 			if ($data) {
 				// 存在
 				$realLink = $data['link'];
-				return array("error" => 0, "usingcache" => true, "filedata" => $FileData, "directlink" => $realLink, "user_agent" => "LogStatistic", "message" => $message);
+				return array("error" => 0, "usingcache" => true, "filedata" => $FileData, "directlink" => $realLink, "user_agent" => "pan.baidu.com", "message" => $message);
 			}
 
 			// 判断今天内是否获取过文件
@@ -283,7 +284,7 @@ class Parse
 		$SVIP_BDUSS = Tool::getSubstr($cookie, 'BDUSS=', ';');
 
 		// 开始获取真实链接
-		$headerArray = array('User-Agent: LogStatistic', 'Cookie: BDUSS=' . $SVIP_BDUSS . ';');
+		$headerArray = array('User-Agent: pan.baidu.com', 'Cookie: BDUSS=' . $SVIP_BDUSS . ';');
 
 		$header = Req::HEAD($dlink, $headerArray); // 禁止重定向
 		if (!strstr($header, "Location")) {
@@ -342,7 +343,7 @@ class Parse
 			}
 		}
 
-		return array("error" => 0, "filedata" => $FileData, "directlink" => $real_link, "user_agent" => "LogStatistic", "message" => $message);
+		return array("error" => 0, "filedata" => $FileData, "directlink" => $real_link, "user_agent" => "pan.baidu.com", "message" => $message);
 	}
 
 	private static function getListApi(string $Shorturl, string $Dir, bool $IsRoot, string $Password, int $Page = 1)
@@ -366,17 +367,23 @@ class Parse
 
 	private static function getDlink(string $fs_id, string $timestamp, string $sign, string $randsk, string $share_id, string $uk, int $app_id = 250528)
 	{ // 获取下载链接
-		$url = 'https://pan.baidu.com/api/sharedownload?app_id=' . $app_id . '&channel=chunlei&clienttype=12&sign=' . $sign . '&timestamp=' . $timestamp . '&web=1'; // 获取下载链接
-
+		// 解码 randsk（如果需要）
 		if (strstr($randsk, "%")) $randsk = urldecode($randsk);
-		$data = "encrypt=0" . "&extra=" . urlencode('{"sekey":"' . $randsk . '"}') . "&fid_list=[$fs_id]" . "&primaryid=$share_id" . "&uk=$uk" . "&product=share&type=nolimit";
-		$header = array(
-			"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.69",
-			"Cookie: " . config('baiduwp.cookie'),
-			"Referer: https://pan.baidu.com/disk/home"
-		);
-		return json_decode(Req::POST($url, $data, $header), true);
-		// 没有 sekey 参数就 118, -20出现验证码
+		
+		// 获取 Cookie
+		$cookie = config('baiduwp.cookie');
+		
+		// 调用外部验证 API
+		$result = VerificationService::getSharedownload($fs_id, $share_id, $uk, $randsk, (int)$timestamp, $cookie);
+		
+		// 如果外部 API 调用失败，返回错误信息
+		if (isset($result['errno']) && $result['errno'] !== 0) {
+			return $result;
+		}
+		
+		// 如果外部 API 返回成功，返回结果
+		// 注意：外部 API 的响应格式可能需要根据实际情况调整
+		return $result;
 	}
 
 	private static function listError($Filejson, $message): array

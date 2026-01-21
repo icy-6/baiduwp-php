@@ -94,11 +94,16 @@ class System extends BaseController
      */
     public function update(Request $request)
     {
-        // 定义和获取是否包含预发行，是否强制检查
-        $includePreRelease = $request->get('includePreRelease') === 'true';
-        $enforce = $request->get('enforce') === 'true';
-
-        $result = Update::check($includePreRelease, $enforce); // 获取结果
-        return json($result);
+        // 更新检查已禁用
+        return json([
+            'code' => 0,
+            'version' => config('baiduwp.program_version') ?? Index::$version,
+            'PreRelease' => false,
+            'file_url' => '',
+            'page_url' => '',
+            'have_update' => false,
+            'now_version' => config('baiduwp.program_version') ?? Index::$version,
+            'info' => ['Update-Check-Disabled']
+        ]);
     }
 }
