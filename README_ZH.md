@@ -5,7 +5,7 @@
 PanDownload 网页复刻版，PHP 语言版<br/>
 
 ## ⚠️ 重要声明
-本项目是 [baiduwp](htttps://github.com/TkzcM/baiduwp) 的 PHP 语言实现，使用 PHP 语言重写了原项目的功能。项目使用百度公开 API 接口获取下载链接。需要配置您自己的百度网盘账号后才可以使用。
+本项目是 [baiduwp-php](https://github.com/yuantuo666/baiduwp-php) 的 修复版，修复了部分接口失效的问题
 
 本工具无任何破解功能，所有代码开源，仅供学习参考，请遵守相关法律法规，不得将本项目用于商业用途，使用本项目造成的一切后果与项目开发者无关。
 
@@ -33,91 +33,22 @@ PanDownload 网页复刻版，PHP 语言版<br/>
 
 # 🔧 安装及设置
 
-## 宝塔面板 / 虚拟主机安装
-[AFF] 市面上虚拟主机参数参差不齐，经测试 [雨云](https://www.rainyun.com/?ref=MjQyNDk=) 可完美运行本程序(香港EP二代 入门版, 7元/月)。
-
-### 虚拟主机 EasyPanel 面板安装
-1. 进入 [Releases](https://github.com/yuantuo666/baiduwp-php/releases) 下载项目文件 `baiduwp-php-v?.?.?.zip`
-2. 将压缩包上传到 EasyPanel 面板 `/` 根目录并解压
-3. 删除默认的 `/wwwroot` 目录，并将解压的文件夹改名为 `/wwwroot`
-4. 确认存在 `/wwwroot/public/index.php` 入口文件后，在配置域名页面中，绑定域名到 `/wwwroot/public` 目录下
-5. 进入网站 `http://<网站域名>/install`，按照页面提示进行安装（如无法进入，可能是伪静态配置错误，默认可在 `/wwwroot/public/.htaccess` 中设置）
-6. 进入 `http://<网站域名>/admin` 的系统设置页面中设置 普通 和 SVIP账号 的 Cookie。
-
-### 宝塔面板安装
-1. 进入 [Releases](https://github.com/yuantuo666/baiduwp-php/releases) 下载项目文件 `baiduwp-php-v?.?.?.zip`
-2. 在宝塔面板创建网站，上传项目文件到网站根目录并解压
-3. 在 网站 —— 站点修改 —— 子目录绑定 中，绑定网站域名到子目录 `public`
-4. 在 网站 —— 站点修改 —— 伪静态 中，选择 `thinkphp` 并保存。
-5. 进入网站 `http://<网站域名>/install`，按照页面提示进行安装
-6. 进入 `http://<网站域名>/admin` 的系统设置页面中设置 普通 和 SVIP账号 的 Cookie。
-
-## Docker 安装
-### 使用 SQLite 数据库 / 不使用数据库
-1. 安装 docker
-2. 执行下面的命令
-```
-docker pull yuantuo666/baiduwp-php
-docker run -d -p 8080:8000 yuantuo666/baiduwp-php
-```
-```
-== 相关信息 ==
-启动后服务将在 http://服务器IP:8080/ 运行
-如需修改端口，可修改上方命令
-
-== 安装时配置 ==
-请 关闭数据库功能 或 切换至 SQLite 数据库
-
-== 设置页面 ==
-http://服务器IP:8080/admin
-```
-
-### 使用 MySQL 数据库
-1. 安装 docker
-2. 执行下面的命令
-```
-docker pull mysql
-docker network create --subnet 172.28.0.0/16 mysql-network
-docker run -d -e MYSQL_ROOT_PASSWORD="root" --network mysql-network --ip 172.28.0.2 mysql
-
-docker pull yuantuo666/baiduwp-php
-docker run -d --network mysql-network --ip 172.28.0.3 -p 8080:8000 yuantuo666/baiduwp-php
-```
-```
-== 相关信息 ==
-启动后服务将在 http://服务器IP:8080/ 运行
-如需修改端口，可修改上方命令
-
-== 安装时配置 ==
-数据库地址 172.28.0.2
-数据库用户名 root
-数据库密码 root
-数据库名 bdwp
-
-== 设置页面 ==
-http://服务器IP:8080/admin
-```
-
-### 自行构建
-```
-git clone https://github.com/yuantuo666/baiduwp-php
-cd baiduwp-php
-docker build -t baiduwp-php .
-docker run -d -p 80:8000 baiduwp-php
-
-docker exec -it <容器ID> /bin/bash
-tar -cvf /app.tar /app
-cp /app.tar /app/public/app.tar
-wget http://<HOST>/app.tar
+### 宝塔面板安装（暂时只支持此种方法）
+1. 进入 [Releases](https://github.com/icy-6/baiduwp-php/releases) 下载项目文件 `baiduwp-php-v?.?.?.zip
+2. 在php扩展中，安装sg15扩展（必须安装，否则使用报错）
+3. 在宝塔面板创建网站，上传项目文件到网站根目录并解压
+4. 在 网站 —— 站点修改 —— 子目录绑定 中，绑定网站域名到子目录 `public`
+5. 在 网站 —— 站点修改 —— 伪静态 中，选择 `thinkphp` 并保存。
+6. 进入网站 `http://<网站域名>/install`，按照页面提示进行安装
+7. 进入 `http://<网站域名>/admin` 的系统设置页面中设置 普通 和 SVIP账号 的 Cookie。
 ```
 
 ## 📌 使用提示
-- 推荐安装方式： Docker > 宝塔/EasyPanel 面板 > 手动安装
 - 仅支持 **PHP 8 和 8+**！
+- 必须在php扩展中安装sg15扩展！（重要）
 - 项目 `4.0.0` 及之后版本采用 `ThinkPHP` 框架
   - 数据库和配置与旧版本不兼容，需要重新按照新的方法安装
   - 如果上方的安装教程没有介绍到你的运行环境，可以搜索`<运行环境> + ThinkPHP项目安装方法`
-- 如果想自行搭建环境，请参考 `Dockerfile` 中的安装命令配置环境
 - 本项目使用的接口容易导致账号限速，参见 [#113](https://github.com/yuantuo666/baiduwp-php/issues/113)
 - 需要配置两个 `完整 Cookie`(普通账号和SVIP账号均可) 才可以获取下载链接，获取方法需抓包。
   - 获取 Cookie 参考 [图文教程](https://blog.imwcr.cn/2022/11/24/%e5%a6%82%e4%bd%95%e6%8a%93%e5%8c%85%e8%8e%b7%e5%8f%96%e7%99%be%e5%ba%a6%e7%bd%91%e7%9b%98%e7%bd%91%e9%a1%b5%e7%89%88%e5%ae%8c%e6%95%b4-cookie/)
